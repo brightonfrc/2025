@@ -112,10 +112,10 @@ public class FieldOrientedDrive extends Command {
         SmartDashboard.putNumber("xSpeed", xSpeed);
 
         ySpeed = joystickMoveMagnitude * Math.sin(joystickMoveBearing) * (slowModeActive ? TestingConstants.maximumSpeedReduced : TestingConstants.maximumSpeed);
-        if(Math.abs(ySpeed)<FieldOrientedDriveConstants.moveJoystickDeadzone){
-            //apply a deadzone to xSpeed
-            ySpeed=0;
-        }
+        // if(Math.abs(ySpeed)<FieldOrientedDriveConstants.moveJoystickDeadzone){
+        //     //apply a deadzone to ySpeed
+        //     ySpeed=0;
+        // }
         if(ySpeed>previousYSpeed+AccelerationLimiterConstants.maximumAcceleration){
             ySpeed=previousYSpeed+AccelerationLimiterConstants.maximumAcceleration;
         }
