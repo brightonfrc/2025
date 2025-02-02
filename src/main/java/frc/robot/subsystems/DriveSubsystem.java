@@ -28,6 +28,7 @@ import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -130,7 +131,10 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    Pose2d pose= m_odometry.getPoseMeters();
+    SmartDashboard.putNumber("Pose/x", pose.getX());
+    SmartDashboard.putNumber("Pose/y", pose.getY());
+    return pose;
   }
 
   /**
@@ -160,6 +164,9 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    SmartDashboard.putNumber("Speed/X", xSpeed);
+    SmartDashboard.putNumber("Speed/Y", ySpeed);
+    SmartDashboard.putNumber("Speed/Rotation", rot);
     // Convert the commanded speeds into the correct units for the drivetrain
     double xSpeedDelivered = xSpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;

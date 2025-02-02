@@ -61,7 +61,6 @@ public final class Constants {
   public static class GameSetup {
     public static final double startAngleOffset = 0; // Degrees
     public static final boolean isFieldRelative = false; // true: field relative; false: robot relative
-    public static final String pathPlannerAutoStrategy = "Speaker 1 Note Right";
   }
 
   public static class CANIds {

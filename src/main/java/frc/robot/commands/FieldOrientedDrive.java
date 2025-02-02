@@ -9,6 +9,7 @@ import frc.robot.Constants.TestingConstants;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /** An example command that uses an example subsystem. */
 public class FieldOrientedDrive extends Command {
@@ -52,10 +53,10 @@ public class FieldOrientedDrive extends Command {
         bearingPIDController.enableContinuousInput(0, 2*Math.PI);
         previousXSpeed=0;
         previousYSpeed=0;
-        driveSubsystem.resetGyro();
         goalBearing=0;
         slowModeActive=false;
         hasToggled=false;
+        driveSubsystem.resetGyro();
     }
     // Called every time the scheduler runs while the command is scheduled.
     @Override
