@@ -4,10 +4,15 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -24,6 +29,25 @@ import edu.wpi.first.math.util.Units;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static class PathPlannerConstants{
+    public static final DCMotor m_dcmotor= DCMotor.getNEO(1);
+    public static final ModuleConfig moduleConfig= new ModuleConfig(ModuleConstants.kWheelDiameterMeters/2, DriveConstants.kMaxSpeedMetersPerSecond, 1.0, m_dcmotor, 80, 1);
+    //Each swerve module is 1.720kg (using neo). So 4 of them are 0.81176m from center of robot
+    //Sum of MOI Of 4 modules is 4.5336 KGM^2
+    //The rest of chassis is 6.12 kg
+    //Plug into online calculator to get 0.4463 KGM^2
+    public static final double momentOfInertia=4.9799;
+    public static final RobotConfig config= new RobotConfig(13, momentOfInertia, moduleConfig, new Translation2d[]
+    {
+      new Translation2d(DriveConstants.kWheelBase / 2, DriveConstants.kTrackWidth / 2),
+      new Translation2d(DriveConstants.kWheelBase / 2, -DriveConstants.kTrackWidth / 2),
+      new Translation2d(-DriveConstants.kWheelBase / 2, DriveConstants.kTrackWidth / 2),
+      new Translation2d(-DriveConstants.kWheelBase / 2, -DriveConstants.kTrackWidth / 2)
+    }
+    );
+    //edit as required
+    public static final Pose2d startPose= new Pose2d(1.0,2.0, new Rotation2d());
+  }
   public static class AccelerationLimiterConstants{
     public static double maximumAcceleration=0.02;
     public static double maximumDeceleration=0.02;
@@ -33,9 +57,9 @@ public final class Constants {
   }
   public static class TestingConstants{
     public static final double maximumSpeed=0.40;
-    public static final double maximumRotationSpeed=0.01;
+    public static final double maximumRotationSpeed=2;
     public static final double maximumSpeedReduced=0.10;
-    public static final double maximumRotationSpeedRobotOriented=0.005;
+    public static final double maximumRotationSpeedRobotOriented=1;
   }
 
   public static class GameSetup {
@@ -74,9 +98,12 @@ public final class Constants {
     public static final double kRotationalSlewRate = 2.0; // percent per second (1 = 100%)
 
     // Chassis configuration
-    public static final double kTrackWidth = Units.inchesToMeters(14) + 90;
+    //track width (left of left wheel to right of right wheel) is 60cm. Single wheel width is 2.6cm ish?
+    public static final double kTrackWidth = 0.574;
     // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = Units.inchesToMeters(14) + 90;
+
+    //track length (front of left wheel to back of left wheel) is 63.1-5.7
+    public static final double kWheelBase = 0.574;
     // Distance between front and back wheels on robot
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),

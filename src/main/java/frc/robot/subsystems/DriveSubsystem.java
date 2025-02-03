@@ -15,10 +15,18 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.PathPlannerConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveSubsystem extends SubsystemBase {
   // Create MAXSwerveModules
@@ -60,7 +68,55 @@ public class DriveSubsystem extends SubsystemBase {
   public DriveSubsystem() {
     // Usage reporting for MAXSwerve template
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
+
+    //Pathplanner
+    RobotConfig config=PathPlannerConstants.config;
+
+    // Configure AutoBuilder last
+    AutoBuilder.configure(
+            this::getPose, // Robot pose supplier
+            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            (speeds, feedforwards) -> drive(speeds.vxMetersPerSecond/DriveConstants.kMaxSpeedMetersPerSecond,speeds.vyMetersPerSecond/DriveConstants.kMaxSpeedMetersPerSecond,speeds.omegaRadiansPerSecond/DriveConstants.kMaxAngularSpeed, false), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+            new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                    new PIDConstants(20.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(3.0, 0.0, 0.0) // Rotation PID constants
+            ),
+            config, // The robot configuration
+            () -> {
+              // Boolean supplier that controls when the path will be mirrored for the red alliance
+              // This will flip the path being followed to the red side of the field.
+              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+              var alliance = DriverStation.getAlliance();
+              if (alliance.isPresent()) {
+                return alliance.get() == DriverStation.Alliance.Red;
+              }
+              return false;
+            },
+            this // Reference to this subsystem to set requirements
+    );
+
+    //reset gyro
+    resetGyro();
   }
+
+  /**
+   * Returns a Chassis Speeds object representing the speed of the robot
+   */
+  public ChassisSpeeds getChassisSpeeds(){
+    return DriveConstants.kDriveKinematics.toChassisSpeeds(
+      m_frontLeft.getState(),
+      m_frontRight.getState(),
+      m_rearLeft.getState(),
+      m_rearRight.getState()
+    );
+  }
+  // public Pose2d getPosePathPlanner(){
+  //   Pose2d pose =getPose();
+  //   pose.div(1000);
+  //   return pose;
+  // }
 
   @Override
   public void periodic() {
@@ -81,7 +137,11 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The pose.
    */
   public Pose2d getPose() {
-    return m_odometry.getPoseMeters();
+    Pose2d pose= m_odometry.getPoseMeters();
+    SmartDashboard.putNumber("Pose/x", pose.getX());
+    SmartDashboard.putNumber("Pose/y", pose.getY());
+    SmartDashboard.putNumber("Pose/rot", pose.getRotation().getDegrees());
+    return pose;
   }
 
   /**
@@ -116,6 +176,9 @@ public class DriveSubsystem extends SubsystemBase {
     double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
     double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
 
+    SmartDashboard.putNumber("Speed/x", xSpeed);
+    SmartDashboard.putNumber("Speed/y", ySpeed);
+    SmartDashboard.putNumber("Speed/rot", rot);
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
