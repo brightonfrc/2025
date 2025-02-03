@@ -34,7 +34,7 @@ public final class Constants {
     //Sum of MOI Of 4 modules is 4.5336 KGM^2
     //The rest of chassis is 6.12 kg
     //Plug into online calculator to get 0.4463 KGM^2
-    public static final double momentOfInertia=0.49799;
+    public static final double momentOfInertia=4.9799;
     public static final RobotConfig config= new RobotConfig(13, momentOfInertia, moduleConfig, new Translation2d[]
     {
       new Translation2d(DriveConstants.kWheelBase / 2, DriveConstants.kTrackWidth / 2),

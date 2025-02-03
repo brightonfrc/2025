@@ -13,6 +13,7 @@ import frc.robot.subsystems.ExampleSubsystem;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -37,8 +38,6 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
-    m_driveSubsystem.setDefaultCommand(fieldOrientedDrive);
-    // m_driveSubsystem.drive(m_driverController.getLeftX(), m_driverController.getLeftY(), 0, false);
     configureBindings();
   }
 
@@ -69,6 +68,25 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return new PathPlannerAuto("Test Auto");
+    // return new PathPlannerAuto("Test Auto");
+    return Autos.exampleAuto(m_exampleSubsystem);
   }
+
+  public void ResetOdometry(){
+    m_driveSubsystem.resetOdometry(new Pose2d());
+  }
+
+  /**
+   * Use this command after autonomous is done because it interacts funny with PathPlanner
+   */
+  public void ConfigureDefaultCommand(){
+    m_driveSubsystem.setDefaultCommand(fieldOrientedDrive);
+    // m_driveSubsystem.drive(m_driverController.getLeftX(), m_driverController.getLeftY(), 0, false);
+  }
+  
+  public void getPose(){
+    m_driveSubsystem.getPose();
+  }
+
+
 }

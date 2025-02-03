@@ -45,7 +45,6 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    SmartDashboard.putBoolean("Autonomous Active", false);
     
   }
 
@@ -59,19 +58,25 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    //reset odometry
+    m_robotContainer.ResetOdometry();
+    //disable FieldOrientedDrive Command
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     SmartDashboard.putBoolean("Autonomous Active", true);
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+    
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
     SmartDashboard.putString("PathPlanner/Current Path Name", PathPlannerAuto.currentPathName);
-    SmartDashboard.putBoolean("Autonomous Active", true);
+    //Pose is fine if pathplanner doesn't run. Starts at 0,0,0
+    // m_robotContainer.getPose();
   }
 
   @Override
@@ -83,6 +88,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    SmartDashboard.putBoolean("Autonomous Active", false);
+    m_robotContainer.ConfigureDefaultCommand();
   }
 
   /** This function is called periodically during operator control. */
