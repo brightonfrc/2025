@@ -46,7 +46,7 @@ public final class Constants {
     }
     );
     //edit as required
-    public static final Pose2d startPose= new Pose2d(1.0,2.0, new Rotation2d());
+    public static final Pose2d startPose= new Pose2d(0.0,4.0, new Rotation2d(0));
   }
   public static class AccelerationLimiterConstants{
     public static double maximumAcceleration=0.02;

@@ -75,7 +75,7 @@ public class DriveSubsystem extends SubsystemBase {
     // Configure AutoBuilder last
     AutoBuilder.configure(
             this::getPose, // Robot pose supplier
-            this::resetOdometry, // Method to reset odometry (will be called if your auto has a starting pose)
+            this::DummyReset, // Method to reset odometry (will be called if your auto has a starting pose)
             this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> drive(speeds.vxMetersPerSecond/DriveConstants.kMaxSpeedMetersPerSecond,speeds.vyMetersPerSecond/DriveConstants.kMaxSpeedMetersPerSecond,speeds.omegaRadiansPerSecond/DriveConstants.kMaxAngularSpeed, false), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
@@ -112,11 +112,9 @@ public class DriveSubsystem extends SubsystemBase {
       m_rearRight.getState()
     );
   }
-  // public Pose2d getPosePathPlanner(){
-  //   Pose2d pose =getPose();
-  //   pose.div(1000);
-  //   return pose;
-  // }
+  public void DummyReset(Pose2d useless){
+    //a method that literally does nothing
+  }
 
   @Override
   public void periodic() {

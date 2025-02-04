@@ -85,7 +85,7 @@ public class RobotContainer {
     } catch (Exception e) {
         DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
         return Commands.none();
-  }
+    }
   }
   public void ConfigureDefaultCommand(){
     m_driveSubsystem.setDefaultCommand(fieldOrientedDrive);
@@ -95,4 +95,11 @@ public class RobotContainer {
   public void ResetPose(){
     m_driveSubsystem.resetOdometry(PathPlannerConstants.startPose);
   }
+  public void GetPose(){
+    m_driveSubsystem.getPose();
+  }
+  // public void TestOdometry(){
+  //   // from my testing, odometry works
+  //   m_driveSubsystem.drive(0.01,0,0,false);
+  // }
 }
