@@ -46,7 +46,7 @@ public class FieldOrientedDrive extends Command {
     @Override
     public void initialize() {
         bearingPIDController = new PIDController(FieldOrientedDriveConstants.kFODP, FieldOrientedDriveConstants.kFODI, FieldOrientedDriveConstants.kFODD);
-        //setting a tolerance of 2 degrees
+        //setting a tolerance of 1 degrees
         bearingPIDController.setTolerance(Math.PI/360);
         bearingPIDController.setSetpoint(0);
         bearingPIDController.enableContinuousInput(0, 2*Math.PI);
