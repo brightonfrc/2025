@@ -129,7 +129,7 @@ public final class Constants {
     public static final double minArmAngle=-140;
     //arm angle above horizontal
     //in actuality, it starts at 124
-    public static final double maxArmAngle=128;
+    public static final double maxArmAngle=110;
     public static final double maxLiftAngle=100;
     public static final double minLiftAngle=10;
   }

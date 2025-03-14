@@ -25,6 +25,8 @@ public class JankLift extends Command {
   private double previousPower;
   private Boolean emergencyStop;
   private Height height;
+  private PIDController armResetController;
+  private PIDController liftResetController;
   /** Creates a new Lift. */
   public JankLift(DatisLift lift, Arm arm, Height heightDesired) {
     this.arm=arm;
@@ -99,6 +101,11 @@ public class JankLift extends Command {
     armController.setSetpoint(armAngleRequired);
     emergencyStop=false;
     lift.setHeight(height);
+
+    liftResetController= new PIDController(0, 0.01, 0);
+    liftResetController.setSetpoint(30);
+    armResetController= new PIDController(0, 0.01, 0);
+    armResetController.setSetpoint(0);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -122,7 +129,14 @@ public class JankLift extends Command {
     desiredPower+=LiftConstants.kWeightMomentOffsetFactor*Math.cos(currentAngle);
     // SmartDashboard.putNumber("Power/Lift", desiredPower);
     // previousPower=desiredPower;
-    lift.setPower(desiredPower);
+    if ((currentAngle>Math.toRadians(AngleLimitConstants.maxArmAngle))
+        ||(currentAngle<Math.toRadians(AngleLimitConstants.minArmAngle))){
+        //reset arm to angle 0
+        lift.setPower(armResetController.calculate(currentAngle));     
+      }
+      else{
+        lift.setPower(desiredPower);
+      }
     // SmartDashboard.putBoolean("Command active", !liftController.atSetpoint());
 
     if (height!=Height.StartingConfig) { 
@@ -132,14 +146,20 @@ public class JankLift extends Command {
       SmartDashboard.putNumber("Angle/Arm", Math.toDegrees(currentAngle+currentArmAngle));
       SmartDashboard.putNumber("Power/Arm", desiredArmPower);
       // arm.setPower(desiredArmPower+ArmConstants.kWeightMomentOffsetFactor*Math.cos(Math.toRadians(currentArmAngle+currentAngle)));
-      arm.setPower(desiredArmPower);
+      
       //emergency end command if lift or arm angle outside of expected range
       // if ((currentAngle>Math.toRadians(AngleLimitConstants.maxLiftAngle))
       // ||(currentAngle<Math.toRadians(AngleLimitConstants.minLiftAngle))
       // ||(currentArmAngle>Math.toRadians(AngleLimitConstants.maxArmAngle))
       // ||(currentArmAngle<Math.toRadians(AngleLimitConstants.minArmAngle))){
-      //   emergencyStop=true;
-      // }
+      if ((currentArmAngle>Math.toRadians(AngleLimitConstants.maxArmAngle))
+        ||(currentArmAngle<Math.toRadians(AngleLimitConstants.minArmAngle))){
+        //reset arm to angle 0
+        arm.setPower(armResetController.calculate(currentArmAngle));     
+      }
+      else{
+        arm.setPower(desiredArmPower);
+      }
     }
     else if (height==Height.StartingConfig&&liftController.atSetpoint()){
       double currentArmAngle=Math.toRadians(arm.getArmAngle());
